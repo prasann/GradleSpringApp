@@ -1,0 +1,56 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-cargo-plugin:1.5'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'cargo'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+   providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+   
+   compile 'org.springframework:spring-core:3.2.3.RELEASE'
+   compile 'org.springframework:spring-webmvc:4.0.5.RELEASE'
+   compile 'org.slf4j:slf4j-api:1.7.7'
+   compile 'org.slf4j:slf4j-log4j12:1.7.7'
+   compile 'log4j:log4j:1.2.17'
+  
+   testCompile 'junit:junit:4.11'	  
+   testCompile 'org.springframework:spring-test:4.0.5.RELEASE'
+   testCompile 'org.mockito:mockito-all:1.8.4'
+ 
+   runtime 'javax.servlet:jstl:1.2'
+   
+   def cargoVersion = '1.3.3'
+   cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
+          "org.codehaus.cargo:cargo-ant:$cargoVersion"
+}
+
+cargo {
+    containerId = 'tomcat7x'
+    port = 8080
+    
+    deployable {
+        file = file('build/libs/gradleapp.war')
+        context = 'gradleapp'
+    }
+    
+    local {
+    	homeDir = file(System.getenv("TOMCAT_HOME"))
+    	output = file('build/output.log')
+    } 
+}
+
+war {   
+   baseName = 'gradleapp'
+}
